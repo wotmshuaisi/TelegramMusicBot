@@ -10,7 +10,6 @@ import (
 
 	tba "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/sirupsen/logrus"
-	"github.com/wotmshuaisi/TelegramMusicBot/src/lib/utils"
 )
 
 func init() {
@@ -31,12 +30,12 @@ func init() {
 }
 
 func main() {
-	bot, err := tba.NewBotAPI(utils.GetEnvWithFatal("TELEGRAM_TOKEN"))
+	bot, err := tba.NewBotAPI(botToken)
 	if err != nil {
 		logrus.WithError(err).Fatalln("init bot api error")
 	}
 
-	bot.Debug, _ = strconv.ParseBool(utils.GetEnvWithDefault("TELEGRAM_DEBUG", "False"))
+	bot.Debug, _ = strconv.ParseBool(debugMode)
 
 	logrus.Infof("Current Bot: %s", bot.Self.UserName)
 
@@ -68,17 +67,4 @@ func main() {
 		continue
 	}
 
-}
-
-func testhandler(ctx *tba.Update) {
-	// max
-	inlineQueryWG.Add(1)
-	inlineTasksCount++
-	defer func() {
-		inlineTasksCount--
-		inlineQueryWG.Done()
-	}()
-
-	logrus.Infof("offset: %s content: %s", ctx.InlineQuery.Offset, ctx.InlineQuery.Query)
-	time.Sleep(time.Second * 40)
 }
