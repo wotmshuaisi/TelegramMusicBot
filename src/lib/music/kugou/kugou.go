@@ -23,6 +23,9 @@ func (h *handler) setURL(id string, index int, l *[]*music.Item) {
 	geturlWg.Add(1)
 	defer geturlWg.Done()
 	// set url
+	if id == "" {
+		return
+	}
 	var err error
 	(*l)[index].URL, err = h.GetURL(id)
 	if err != nil || (*l)[index].URL == "" {
@@ -38,7 +41,7 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 	jsonparser.ArrayEach(b, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		// get id, title, performer
 		id, err := jsonparser.GetString(value, "320hash")
-		if err != nil {
+		if err != nil || id == "" {
 			id, err = jsonparser.GetString(value, "hash")
 		}
 		title, err := jsonparser.GetString(value, "songname")
