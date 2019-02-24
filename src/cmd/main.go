@@ -58,7 +58,7 @@ func main() {
 				fmt.Println("current tasks", inlineTasksCount)
 				inlineQueryWG.Wait()
 			}
-			go testhandler(&update)
+			go testhandler(bot, &update)
 		}
 		// ....
 
