@@ -1,7 +1,6 @@
 package kugou
 
 import (
-	"log"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -37,7 +36,6 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 	// var wg sync.WaitGroup
 	// fetch list songs
 	jsonparser.ArrayEach(b, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		log.Println(string(value))
 		// get id, title, performer
 		id, err := jsonparser.GetString(value, "320hash")
 		if err != nil {
