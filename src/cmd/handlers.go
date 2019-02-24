@@ -16,7 +16,7 @@ func musicInlineQuery(bot *tba.BotAPI, update *tba.Update, api music.API) {
 		inlineQueryWG.Done()
 	}()
 	// processing event
-	l, err := api.List(update.InlineQuery.Query)
+	l, err := api.ListItem(update.InlineQuery.Query)
 	if err != nil {
 		logrus.WithError(err).Warnf("id: %s query: %s", update.InlineQuery.ID, update.InlineQuery.Query)
 		return
