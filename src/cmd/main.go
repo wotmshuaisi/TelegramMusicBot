@@ -46,10 +46,14 @@ func main() {
 	// get messages
 	updates, _ := bot.GetUpdatesChan(u)
 
-	// running in command mode
+	// telegram event loop
 	for update := range updates {
 		// inline query handling
-		if update.InlineQuery != nil || strings.TrimSpace(update.InlineQuery.Query) != "" {
+		if update.InlineQuery != nil {
+			// skip empty content
+			if strings.TrimSpace(update.InlineQuery.Query) == "" {
+				continue
+			}
 			// inline query task limiter
 			if inlineTasksCount >= maxInlineTaskCount {
 				fmt.Println("current tasks", inlineTasksCount)
