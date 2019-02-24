@@ -6,7 +6,7 @@ import (
 
 func Test_handler_List(t *testing.T) {
 	h := NewAPI()
-	res, err := h.ListItem("hello")
+	res, err := h.ListItem("i wish you didn't love me")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -15,7 +15,7 @@ func Test_handler_List(t *testing.T) {
 	}
 
 	for _, v := range *res {
-		if v.URL == "" || v.URL == "ERROR" || v.Title == "" || v.ID == "" {
+		if v.URL == "" || v.URL == "UNKNOW" || v.Title == "" || v.ID == "" {
 			t.Fatal(v)
 		}
 	}
