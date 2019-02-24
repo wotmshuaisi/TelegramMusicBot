@@ -1,4 +1,4 @@
-package kuwo
+package kugou
 
 import (
 	"testing"

@@ -6,6 +6,7 @@ type Item struct {
 	URL       string
 	Title     string
 	Performer string
+	Duration  int
 }
 
 // API interface of music API
