@@ -12,7 +12,7 @@ type Item struct {
 // API interface of music API
 type API interface {
 	ListItem(text string) (*[]*Item, error)
-	GetURL(id string) (string, error)
-	RemoveItem(l []*Item, index int) []*Item
+	// GetURL(id string) (string, error)
+	// RemoveItem(l []*Item, index int) []*Item
 	// ...
 }
