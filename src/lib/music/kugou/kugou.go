@@ -1,6 +1,7 @@
 package kugou
 
 import (
+	"log"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,7 @@ func (h *handler) setURL(id string, index int, l *[]*music.Item) {
 	var err error
 	(*l)[index].URL, err = h.GetURL(id)
 	if err != nil || (*l)[index].URL == "" {
-		*l = h.RemoveItem(*l, index)
+		(*l)[index].URL = "UNKNOW"
 		return
 	}
 }
@@ -36,8 +37,12 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 	// var wg sync.WaitGroup
 	// fetch list songs
 	jsonparser.ArrayEach(b, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		log.Println(string(value))
 		// get id, title, performer
-		id, err := jsonparser.GetString(value, "hash")
+		id, err := jsonparser.GetString(value, "320hash")
+		if err != nil {
+			id, err = jsonparser.GetString(value, "hash")
+		}
 		title, err := jsonparser.GetString(value, "songname")
 		duration, _ := jsonparser.GetInt(value, "duration")
 		performer, _ := jsonparser.GetString(value, "singername")
@@ -60,17 +65,21 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 	return l
 }
 
-func (h *handler) RemoveItem(l []*music.Item, index int) []*music.Item {
-	return append(l[:index], l[index+1:]...)
-}
-
 func (h *handler) ListItem(text string) (*[]*music.Item, error) {
 	b, err := utils.HTTPGetJSON(h.EndPoint + "api/v3/search/song?format=json&keyword=" + text + "&page=0&pagesize=15&showtype=1")
 	if err != nil {
 		return nil, err
 	}
 	b, _, _, err = jsonparser.Get(b, "data")
-	l := h.fetchSongs(b)
+	var l []*music.Item
+
+	// remove audio with UNKNOW URL items
+	for _, v := range h.fetchSongs(b) {
+		if v.URL != "UNKNOW" && v.URL != "" {
+			l = append(l, v)
+		}
+	}
+
 	return &l, nil
 }
 
