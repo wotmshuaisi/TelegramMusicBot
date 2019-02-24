@@ -33,7 +33,7 @@ func musicInlineQuery(bot *tba.BotAPI, update *tba.Update, api music.API) {
 
 	res, err := bot.AnswerInlineQuery(config)
 	if err != nil || !res.Ok {
-		logrus.WithError(err).Warnf("query: %s res: %+v", update.InlineQuery.Query, res)
+		logrus.WithError(err).Warnf("query: %s res: %+v result: %+v", update.InlineQuery.Query, res, config.Results)
 	}
 
 }
