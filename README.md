@@ -1,5 +1,7 @@
 # TelegramMusicBot
 
+[![Build Status](https://travis-ci.com/wotmshuaisi/TelegramMusicBot.svg?branch=master)](https://travis-ci.com/wotmshuaisi/TelegramMusicBot)
+
 telegram music bot based on golang
 
 ## Screenshot
