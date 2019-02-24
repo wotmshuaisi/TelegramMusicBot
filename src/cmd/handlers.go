@@ -28,12 +28,12 @@ func musicInlineQuery(bot *tba.BotAPI, update *tba.Update, api music.API) {
 	}
 
 	for _, v := range *l {
-		config.Results = append(config.Results, tba.NewInlineQueryResultAudio(v.ID, v.URL, v.Title, v.Performer, v.Duration))
+		config.Results = append(config.Results, tba.NewInlineQueryResultAudio(v.ID, v.URL, "👍 "+v.Title, v.Performer, v.Duration))
 	}
 
 	res, err := bot.AnswerInlineQuery(config)
 	if err != nil || !res.Ok {
-		logrus.WithError(err).Warnf("query: %s res: %+v result: %+v", update.InlineQuery.Query, res, config.Results)
+		logrus.WithError(err).Warnf("query: %s res: %+v", update.InlineQuery.Query, res)
 	}
 
 }
