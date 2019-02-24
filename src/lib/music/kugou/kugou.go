@@ -3,6 +3,8 @@ package kugou
 import (
 	"sync"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/buger/jsonparser"
 	"github.com/google/uuid"
 	"github.com/wotmshuaisi/TelegramMusicBot/src/lib/music"
@@ -12,7 +14,8 @@ import (
 var geturlWg sync.WaitGroup
 
 type handler struct {
-	EndPoint string
+	EndPoint  string
+	Endpoint1 string
 }
 
 func (h *handler) getURL(id string, index int, l *[]*music.Item) {
@@ -20,15 +23,17 @@ func (h *handler) getURL(id string, index int, l *[]*music.Item) {
 	geturlWg.Add(1)
 	defer geturlWg.Done()
 	// get song detail
-	b, err := utils.HTTPGetJSON(h.EndPoint + "?cmd=playInfo&hash=" + id)
+	b, err := utils.HTTPGetJSON(h.Endpoint1 + "app/i/getSongInfo.php?cmd=playInfo&hash=" + id)
 	if err != nil {
 		(*l)[index].URL = "ERROR"
+		logrus.WithError(err).Errorf("bytes: %s", b)
 		return
 	}
 	// set url
 	(*l)[index].URL, err = jsonparser.GetString(b, "url")
 	if err != nil {
 		(*l)[index].URL = "ERROR"
+		logrus.WithError(err).Errorf("id: %s, bytes: %s", id, b)
 		return
 	}
 }
@@ -39,7 +44,7 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 	// fetch list songs
 	jsonparser.ArrayEach(b, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		// get id, title, performer
-		id, err := jsonparser.GetString(value, "320hash")
+		id, err := jsonparser.GetString(value, "hash")
 		title, err := jsonparser.GetString(value, "songname")
 		duration, _ := jsonparser.GetInt(value, "duration")
 		performer, _ := jsonparser.GetString(value, "singername")
@@ -63,7 +68,7 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 }
 
 func (h *handler) List(text string) (*[]*music.Item, error) {
-	b, err := utils.HTTPGetJSON(h.EndPoint + "?format=json&keyword=" + text + "&page=0&pagesize=15&showtype=1")
+	b, err := utils.HTTPGetJSON(h.EndPoint + "api/v3/search/song?format=json&keyword=" + text + "&page=0&pagesize=15&showtype=1")
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +84,7 @@ func (h *handler) Get(id string) (*music.Item, error) {
 // NewAPI return kuwo API handler
 func NewAPI() music.API {
 	return &handler{
-		EndPoint: "http://mobilecdn.kugou.com/api/v3/search/song",
+		EndPoint:  "http://mobilecdn.kugou.com/",
+		Endpoint1: "http://m.kugou.com/",
 	}
 }
