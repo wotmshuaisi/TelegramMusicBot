@@ -8,8 +8,10 @@ import (
 	"strings"
 	"time"
 
-	tba "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/wotmshuaisi/TelegramMusicBot/src/lib/music/kugou"
+
 	"github.com/sirupsen/logrus"
+	tba "github.com/wotmshuaisi/telegram-bot-api"
 )
 
 func init() {
@@ -58,7 +60,8 @@ func main() {
 				fmt.Println("current tasks", inlineTasksCount)
 				inlineQueryWG.Wait()
 			}
-			go testhandler(bot, &update)
+			// music handler
+			go musicInlineQuery(bot, &update, kugou.NewAPI())
 		}
 		// ....
 

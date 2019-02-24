@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/google/uuid"
-
-	tba "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/sirupsen/logrus"
+	"github.com/wotmshuaisi/TelegramMusicBot/src/lib/music"
+	tba "github.com/wotmshuaisi/telegram-bot-api"
 )
 
-func testhandler(bot *tba.BotAPI, ctx *tba.Update) {
-	// task limiter
+//  Music Inline Query handler
+func musicInlineQuery(bot *tba.BotAPI, update *tba.Update, api music.API) {
+	// counting tasks number for restriction
 	inlineQueryWG.Add(1)
 	inlineTasksCount++
 	defer func() {
@@ -16,18 +16,24 @@ func testhandler(bot *tba.BotAPI, ctx *tba.Update) {
 		inlineQueryWG.Done()
 	}()
 	// processing event
-	u, _ := uuid.NewUUID()
-	i := tba.NewInlineQueryResultAudio(u.String(), "http://fs.open.kugou.com/05914e4cdceb1d0e406dac5a0722168c/5c72eabb/G140/M04/00/01/LIcBAFvMQmaAVJNYAEgvmkjJyY0089.mp3", "Hello - Adele")
+	l, err := api.List(update.InlineQuery.Query)
+	if err != nil {
+		logrus.WithError(err).Warnf("id: %s query: %s", update.InlineQuery.ID, update.InlineQuery.Query)
+		return
+	}
 
 	config := tba.InlineConfig{
-		InlineQueryID: ctx.InlineQuery.ID,
+		InlineQueryID: update.InlineQuery.ID,
 		IsPersonal:    true,
-		Results:       []interface{}{&i},
+	}
+
+	for _, v := range *l {
+		config.Results = append(config.Results, tba.NewInlineQueryResultAudio(v.ID, v.URL, v.Title, v.Performer, v.Duration))
 	}
 
 	res, err := bot.AnswerInlineQuery(config)
 	if err != nil || !res.Ok {
-		logrus.WithError(err).Warnf("content: %s res: %+v", ctx.InlineQuery.Query, res)
+		logrus.WithError(err).Warnf("query: %s res: %+v", update.InlineQuery.Query, res)
 	}
 
 }
