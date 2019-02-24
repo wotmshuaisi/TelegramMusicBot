@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -57,7 +56,6 @@ func main() {
 			}
 			// inline query task limiter
 			if inlineTasksCount >= maxInlineTaskCount {
-				fmt.Println("current tasks", inlineTasksCount)
 				inlineQueryWG.Wait()
 			}
 			// music handler
