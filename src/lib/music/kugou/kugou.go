@@ -1,4 +1,4 @@
-package kuwo
+package kugou
 
 import (
 	"sync"
@@ -41,6 +41,7 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 		// get id, title, performer
 		id, err := jsonparser.GetString(value, "320hash")
 		title, err := jsonparser.GetString(value, "songname")
+		duration, _ := jsonparser.GetInt(value, "duration")
 		performer, _ := jsonparser.GetString(value, "singername")
 		if err != nil {
 			return
@@ -51,6 +52,7 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 			ID:        uid.String(),
 			Title:     title,
 			Performer: performer,
+			Duration:  int(duration),
 		})
 		// set url
 		go h.getURL(id, len(l)-1, &l)
