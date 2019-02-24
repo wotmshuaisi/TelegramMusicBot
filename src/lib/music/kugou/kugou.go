@@ -18,22 +18,15 @@ type handler struct {
 	Endpoint1 string
 }
 
-func (h *handler) getURL(id string, index int, l *[]*music.Item) {
+func (h *handler) setURL(id string, index int, l *[]*music.Item) {
 	// wait group
 	geturlWg.Add(1)
 	defer geturlWg.Done()
-	// get song detail
-	b, err := utils.HTTPGetJSON(h.Endpoint1 + "app/i/getSongInfo.php?cmd=playInfo&hash=" + id)
-	if err != nil {
-		(*l)[index].URL = "ERROR"
-		logrus.WithError(err).Errorf("bytes: %s", b)
-		return
-	}
 	// set url
-	(*l)[index].URL, err = jsonparser.GetString(b, "url")
-	if err != nil {
-		(*l)[index].URL = "ERROR"
-		logrus.WithError(err).Errorf("id: %s, bytes: %s", id, b)
+	var err error
+	(*l)[index].URL, err = h.GetURL(id)
+	if err != nil || (*l)[index].URL == "" {
+		*l = h.RemoveItem(*l, index)
 		return
 	}
 }
@@ -60,14 +53,18 @@ func (h *handler) fetchSongs(b []byte) []*music.Item {
 			Duration:  int(duration),
 		})
 		// set url
-		go h.getURL(id, len(l)-1, &l)
+		go h.setURL(id, len(l)-1, &l)
 	}, "info")
 	// waiting for all taks done
 	geturlWg.Wait()
 	return l
 }
 
-func (h *handler) List(text string) (*[]*music.Item, error) {
+func (h *handler) RemoveItem(l []*music.Item, index int) []*music.Item {
+	return append(l[:index], l[index+1:]...)
+}
+
+func (h *handler) ListItem(text string) (*[]*music.Item, error) {
 	b, err := utils.HTTPGetJSON(h.EndPoint + "api/v3/search/song?format=json&keyword=" + text + "&page=0&pagesize=15&showtype=1")
 	if err != nil {
 		return nil, err
@@ -77,8 +74,18 @@ func (h *handler) List(text string) (*[]*music.Item, error) {
 	return &l, nil
 }
 
-func (h *handler) Get(id string) (*music.Item, error) {
-	panic("not implemented")
+func (h *handler) GetURL(id string) (string, error) {
+	b, err := utils.HTTPGetJSON(h.Endpoint1 + "app/i/getSongInfo.php?cmd=playInfo&hash=" + id)
+	if err != nil {
+		logrus.WithError(err).Errorf("id: %s, bytes: %s", id, b)
+		return "", err
+	}
+	url, err := jsonparser.GetString(b, "url")
+	if err != nil || url == "" {
+		logrus.WithError(err).Errorf("id: %s, bytes: %s", id, b)
+		return "", err
+	}
+	return url, nil
 }
 
 // NewAPI return kuwo API handler
