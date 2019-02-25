@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/wotmshuaisi/TelegramMusicBot/src/lib/music"
 	tba "github.com/wotmshuaisi/telegram-bot-api"
@@ -29,6 +30,11 @@ func musicInlineQuery(bot *tba.BotAPI, update *tba.Update, api music.API) {
 
 	for _, v := range *l {
 		config.Results = append(config.Results, tba.NewInlineQueryResultAudio(v.ID, v.URL, "👍 "+v.Title, v.Performer, v.Duration))
+	}
+
+	if config.Results == nil {
+		uu, _ := uuid.NewUUID()
+		config.Results = append(config.Results, tba.NewInlineQueryResultArticleMarkdown(uu.String(), "no result", "no result"))
 	}
 
 	res, err := bot.AnswerInlineQuery(config)
