@@ -3,7 +3,8 @@ matrix:
   include:
     # "1.x" always refers to the latest Go version, inc. the patch release.
     # e.g. "1.x" is 1.11 until 1.11.1 is available.
-    - go: 1.11.x
+    - go: 1.9.x
+    - go: 1.10.x
     - go: tip
   allow_failures:
     - go: tip
@@ -21,7 +22,7 @@ script:
   - go vet $(go list ./... | grep -v /vendor/)
   - go test -v ./...
   # Only build binaries from the latest Go release.
-  - gox -os="linux darwin windows" -arch="amd64" -output="bot.." -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...
+  - if [ "${LATEST}" = "true" ]; then gox -os="linux darwin windows" -arch="amd64" -output="bot.." -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
 
 deploy:
   provider: releases
