@@ -5,7 +5,6 @@ matrix:
     # e.g. "1.x" is 1.11 until 1.11.1 is available.
     - go: 1.9.x
     - go: 1.10.x
-    - go: 1.11.x
     - go: tip
   allow_failures:
     - go: tip
@@ -35,7 +34,7 @@ deploy:
   - bot.linux.amd64
   on:
     # What to repository to build
-    repo: wotmshuaisi/telegrammusicbot
+    repo: wotmshuaisi/TelegramMusicBot
     # Only build binaries for tagged commits
     tags: true
     condition: $LATEST = true
